@@ -23,4 +23,6 @@ public interface ThemeRepository extends MongoRepository<Theme, String> {
     List<Theme> findAllByNameAndUser(String name, String idUser);
 
     Theme save(Theme theme);
+
+    void deleteAllByUser(User user);
 }

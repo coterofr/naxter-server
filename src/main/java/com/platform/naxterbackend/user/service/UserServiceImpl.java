@@ -4,10 +4,18 @@ import com.platform.naxterbackend.auth.jwt.JwtProvider;
 import com.platform.naxterbackend.auth.model.JwtToken;
 import com.platform.naxterbackend.auth.model.LoginUser;
 import com.platform.naxterbackend.auth.model.RegisterUser;
+import com.platform.naxterbackend.chat.repository.ChatRepository;
+import com.platform.naxterbackend.chat.repository.MessageRepository;
+import com.platform.naxterbackend.comment.repository.CommentRepository;
+import com.platform.naxterbackend.post.model.Post;
+import com.platform.naxterbackend.post.model.Tag;
+import com.platform.naxterbackend.post.repository.PostRepository;
+import com.platform.naxterbackend.post.repository.TagRepository;
 import com.platform.naxterbackend.profile.model.Profile;
 import com.platform.naxterbackend.profile.repository.ProfileRepository;
 import com.platform.naxterbackend.subscription.model.Subscription;
 import com.platform.naxterbackend.subscription.repository.SubscriptionRepository;
+import com.platform.naxterbackend.theme.repository.ThemeRepository;
 import com.platform.naxterbackend.user.model.ConfigUser;
 import com.platform.naxterbackend.user.model.Role;
 import com.platform.naxterbackend.user.model.RoleEnum;
@@ -37,6 +45,18 @@ public class UserServiceImpl implements UserService {
     private RoleRepository roleRepository;
     @Autowired
     private ProfileRepository profileRepository;
+    @Autowired
+    private ThemeRepository themeRepository;
+    @Autowired
+    private PostRepository postRepository;
+    @Autowired
+    private TagRepository tagRepository;
+    @Autowired
+    private CommentRepository commentRepository;
+    @Autowired
+    private ChatRepository chatRepository;
+    @Autowired
+    private MessageRepository messageRepository;
     @Autowired
     private SubscriptionRepository subscriptionRepository;
     @Autowired
@@ -193,6 +213,23 @@ public class UserServiceImpl implements UserService {
 
         this.subscriptionRepository.deleteAllBySubscriber(user);
         this.subscriptionRepository.deleteAllByProducer(user);
+
+        List<Post> posts = this.postRepository.findByUser(user);
+        for(Post post : posts) {
+            for(Tag tag : post.getTags()) {
+                this.tagRepository.delete(tag);
+            }
+
+            this.commentRepository.deleteAllByPost(post);
+        }
+
+        this.postRepository.deleteAllByUser(user);
+
+        this.messageRepository.deleteAllByEmitter(user);
+        this.messageRepository.deleteAllByReceiver(user);
+        this.chatRepository.deleteAllByUser1(user);
+        this.chatRepository.deleteAllByUser2(user);
+
         this.profileRepository.delete(user.getProfile());
         this.userRepository.delete(user);
 

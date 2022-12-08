@@ -40,4 +40,6 @@ public interface PostRepository extends MongoRepository<Post, String> {
     Long countByUser(User user);
 
     Post save(Post post);
+
+    void deleteAllByUser(User user);
 }

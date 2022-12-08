@@ -11,4 +11,8 @@ public interface ChatRepository extends MongoRepository<Chat, String> {
     Boolean existsByUser1AndUser2(User user1, User user2);
 
     Chat findByUser1AndUser2(User user1, User user2);
+
+    void deleteAllByUser1(User user1);
+
+    void deleteAllByUser2(User user2);
 }

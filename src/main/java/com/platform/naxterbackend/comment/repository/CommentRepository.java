@@ -1,6 +1,7 @@
 package com.platform.naxterbackend.comment.repository;
 
 import com.platform.naxterbackend.comment.model.Comment;
+import com.platform.naxterbackend.post.model.Post;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +13,6 @@ public interface CommentRepository extends MongoRepository<Comment, String> {
     List<Comment> findAllByPostIdOrderByDateDesc(String id);
 
     Comment save(Comment comment);
+
+    void deleteAllByPost(Post post);
 }
