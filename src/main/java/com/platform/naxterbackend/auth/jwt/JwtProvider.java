@@ -37,17 +37,22 @@ public class JwtProvider {
         return Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String generateJwtToken(Authentication authentication) {
-        UserDetailsImpl principal = (UserDetailsImpl)authentication.getPrincipal();
-        List<String> roles = principal.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
-
+    private String buildJwtToken(String subject,
+                                 List<String> roles) {
         return Jwts.builder()
-                   .setSubject(principal.getUsername())
+                   .setSubject(subject)
                    .claim("roles", roles)
                    .setIssuedAt(new Date())
                    .setExpiration(new Date(new Date().getTime() +  expiration))
                    .signWith(SignatureAlgorithm.HS256, secret.getBytes(StandardCharsets.UTF_8))
                    .compact();
+    }
+
+    public String generateJwtToken(Authentication authentication) {
+        UserDetailsImpl principal = (UserDetailsImpl)authentication.getPrincipal();
+        List<String> roles = principal.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+
+        return this.buildJwtToken(principal.getUsername(), roles);
     }
 
     public Boolean validateJwtToken(String token) {
@@ -76,25 +81,13 @@ public class JwtProvider {
         String name = jwtClaims.getSubjectClaim();
         List<String> roles = (List<String>)jwtClaims.getCustomClaim("roles");
 
-        return Jwts.builder()
-                   .setSubject(name)
-                   .claim("roles", roles)
-                   .setIssuedAt(new Date())
-                   .setExpiration(new Date(new Date().getTime() + expiration))
-                   .signWith(SignatureAlgorithm.HS256, secret.getBytes(StandardCharsets.UTF_8))
-                   .compact();
+        return this.buildJwtToken(name, roles);
     }
 
     public String refreshJwtToken(User user) {
         List<String> userRoles = user.getRoles().stream().map(Role::getType).collect(Collectors.toList());
         List<String> roles = userRoles.stream().map(role -> String.format("ROLE_%s", role)).collect(Collectors.toList());
 
-        return Jwts.builder()
-                   .setSubject(user.getName())
-                   .claim("roles", roles)
-                   .setIssuedAt(new Date())
-                   .setExpiration(new Date(new Date().getTime() + expiration))
-                   .signWith(SignatureAlgorithm.HS256, secret.getBytes(StandardCharsets.UTF_8))
-                   .compact();
+        return this.buildJwtToken(user.getName(), roles);
     }
 }

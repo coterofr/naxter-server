@@ -16,6 +16,7 @@ import com.platform.naxterbackend.post.repository.PostRepository;
 import com.platform.naxterbackend.post.repository.TagRepository;
 import com.platform.naxterbackend.profile.model.Profile;
 import com.platform.naxterbackend.profile.repository.ProfileRepository;
+import com.platform.naxterbackend.subscription.model.Subscription;
 import com.platform.naxterbackend.subscription.repository.SubscriptionRepository;
 import com.platform.naxterbackend.theme.model.Theme;
 import com.platform.naxterbackend.theme.repository.ThemeRepository;
@@ -37,7 +38,6 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 @Component
@@ -208,6 +208,10 @@ public class InitDataRunner implements ApplicationRunner {
 
             this.subscriptionRepository.deleteAll();
 
+            Subscription subscription = new Subscription(new SimpleDateFormat("yyyy-MM-dd").parse("2002-05-15"), Boolean.FALSE, user10Saved, user9Saved, null);
+
+            Subscription subscriptionSaved = this.subscriptionRepository.save(subscription);
+
 
             /* INIT DATA POSTS */
 
@@ -244,7 +248,8 @@ public class InitDataRunner implements ApplicationRunner {
             Post post9 = new Post("post_9", "Descripción del Post 9 para resaltar el asunto y objetivos más destacables de este.",
                          BigInteger.ONE, new BigDecimal(9.0), Boolean.FALSE, null, user10Saved, null,
                          new SimpleDateFormat("yyyy-MM-dd").parse("2022-08-18"), new ArrayList<>());
-            Post post10 = new Post("post_10", "Descripción del Post 10 para resaltar el asunto y objetivos más destacables de este. Se trata de una publicación creada por Carlos Otero y que tiene como objetivo tener una de las mejores valoraciones de la plataforma Naxter.",
+            Post post10 = new Post("post_10", "Descripción del Post 10 para resaltar el asunto y objetivos más destacables de este." +
+                          " Se trata de una publicación creada por Carlos Otero y que tiene como objetivo tener una de las mejores valoraciones de la plataforma Naxter.",
                           BigInteger.ONE, new BigDecimal(10.0), Boolean.FALSE, null, user10Saved, null,
                           new SimpleDateFormat("yyyy-MM-dd").parse("2022-09-19"), new ArrayList<>());
 
@@ -293,8 +298,8 @@ public class InitDataRunner implements ApplicationRunner {
             post1.setTags(tags1);
             post2.setTags(tags2);
             post3.setTags(tags3);
-            post4.setTags(tags4);
-            post5.setTags(tags5);
+            post9.setTags(tags4);
+            post10.setTags(tags5);
 
 
             /* INIT DATA THEMES */
@@ -304,9 +309,9 @@ public class InitDataRunner implements ApplicationRunner {
             Theme theme2 = new Theme("theme_2", "Descripción del Theme 2", user10Saved);
             Theme theme3 = new Theme("theme_3", "Descripción del Theme 3", user10Saved);
 
-            Theme theme1Saved =this.themeRepository.save(theme1);
-            Theme theme2Saved =this.themeRepository.save(theme2);
-            Theme theme3Saved =this.themeRepository.save(theme3);
+            Theme theme1Saved = this.themeRepository.save(theme1);
+            Theme theme2Saved = this.themeRepository.save(theme2);
+            Theme theme3Saved = this.themeRepository.save(theme3);
 
             post1.setTheme(theme1Saved);
             post2.setTheme(theme2Saved);

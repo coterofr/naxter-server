@@ -7,8 +7,6 @@ import com.platform.naxterbackend.post.model.UserPost;
 import com.platform.naxterbackend.post.service.PostService;
 import com.platform.naxterbackend.post.service.TagService;
 import com.platform.naxterbackend.post.validator.PostValidator;
-import com.platform.naxterbackend.user.model.User;
-import com.platform.naxterbackend.user.validator.UserValidator;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +76,7 @@ public class PostController {
         return ResponseEntity.ok().body(this.postService.searchPosts(name, theme, user));
     }
 
-    @PreAuthorize("hasRole('PRODUCER')")
+    @PreAuthorize("hasRole('CONSUMER')")
     @GetMapping(
         value = { "/{id}"},
         produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }

@@ -2,7 +2,6 @@ package com.platform.naxterbackend.theme.service;
 
 import com.platform.naxterbackend.theme.model.Theme;
 import com.platform.naxterbackend.theme.model.UserTheme;
-import com.platform.naxterbackend.user.model.User;
 
 import java.util.List;
 

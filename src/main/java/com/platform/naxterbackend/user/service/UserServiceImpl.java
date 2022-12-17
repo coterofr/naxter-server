@@ -4,8 +4,11 @@ import com.platform.naxterbackend.auth.jwt.JwtProvider;
 import com.platform.naxterbackend.auth.model.JwtToken;
 import com.platform.naxterbackend.auth.model.LoginUser;
 import com.platform.naxterbackend.auth.model.RegisterUser;
+import com.platform.naxterbackend.chat.model.Chat;
+import com.platform.naxterbackend.chat.model.Message;
 import com.platform.naxterbackend.chat.repository.ChatRepository;
 import com.platform.naxterbackend.chat.repository.MessageRepository;
+import com.platform.naxterbackend.comment.model.Comment;
 import com.platform.naxterbackend.comment.repository.CommentRepository;
 import com.platform.naxterbackend.post.model.Post;
 import com.platform.naxterbackend.post.model.Tag;
@@ -15,6 +18,7 @@ import com.platform.naxterbackend.profile.model.Profile;
 import com.platform.naxterbackend.profile.repository.ProfileRepository;
 import com.platform.naxterbackend.subscription.model.Subscription;
 import com.platform.naxterbackend.subscription.repository.SubscriptionRepository;
+import com.platform.naxterbackend.theme.model.Theme;
 import com.platform.naxterbackend.theme.repository.ThemeRepository;
 import com.platform.naxterbackend.user.model.ConfigUser;
 import com.platform.naxterbackend.user.model.Role;
@@ -146,7 +150,8 @@ public class UserServiceImpl implements UserService {
 
         Profile profileSaved = this.profileRepository.save(profile);
 
-        User user = new User(registerUser.getName(), registerUser.getEmail(), registerUser.getUserName(), passwordEncoded, Boolean.FALSE, new BigDecimal(0.0), roles, profileSaved, null);
+        User user = new User(registerUser.getName(), registerUser.getEmail(), registerUser.getUserName(), passwordEncoded,
+                             Boolean.FALSE, new BigDecimal(0.0), roles, profileSaved, null);
 
         return userRepository.save(user);
     }
@@ -161,14 +166,106 @@ public class UserServiceImpl implements UserService {
         return new JwtToken(jwtToken);
     }
 
+    private void updateSubscriptions(List<Subscription> subscriptionsSubscriber,
+                                     List<Subscription> subscriptionsProducer,
+                                     User user) {
+        for(Subscription subscription : subscriptionsSubscriber) {
+            subscription.setSubscriber(user);
+
+            this.subscriptionRepository.save(subscription);
+        }
+
+        for(Subscription subscription : subscriptionsProducer) {
+            subscription.setProducer(user);
+
+            this.subscriptionRepository.save(subscription);
+        }
+    }
+
+    private void updateThemes(List<Theme> themes,
+                              User user) {
+        for(Theme theme : themes) {
+            theme.setUser(user);
+
+            this.themeRepository.save(theme);
+        }
+    }
+
+    private void updatePosts(List<Post> posts,
+                             User user) {
+        for(Post post : posts) {
+            post.setUser(user);
+
+            this.postRepository.save(post);
+        }
+    }
+
+    private void updateComments(List<Comment> comments,
+                                User user) {
+        for(Comment comment : comments) {
+            comment.setUser(user);
+
+            this.commentRepository.save(comment);
+        }
+    }
+
+    private void updateMessages(List<Message> messagesEmitter,
+                                List<Message> messagesReceiver,
+                                User user) {
+        for(Message message : messagesEmitter) {
+            message.setEmitter(user);
+
+            this.messageRepository.save(message);
+        }
+
+        for(Message message : messagesReceiver) {
+            message.setReceiver(user);
+
+            this.messageRepository.save(message);
+        }
+    }
+
+    private void updateChats(List<Chat> chatsUser1,
+                             List<Chat> chatsUser2,
+                             User user) {
+        for(Chat chat : chatsUser1) {
+            chat.setUser1(user);
+
+            this.chatRepository.save(chat);
+        }
+
+        for(Chat chat : chatsUser2) {
+            chat.setUser2(user);
+
+            this.chatRepository.save(chat);
+        }
+    }
+
     @Override
     @Transactional(readOnly = false)
     public User edit(String name, ConfigUser configUser) {
         User user = this.userRepository.findByNameIgnoreCase(name);
-        List<Subscription> subscriptionsSubscriber = this.subscriptionRepository.findAllBySubscriber(user);
-        List<Subscription> subscriptionsProducer = this.subscriptionRepository.findAllByProducer(user);
 
+        List<Subscription> subscriptionsSubscriber = new ArrayList<>();
+        List<Subscription> subscriptionsProducer = new ArrayList<>();
+        List<Theme> themes = new ArrayList<>();
+        List<Post> posts = new ArrayList<>();
+        List<Comment> comments = new ArrayList<>();
+        List<Message> messagesEmitter = new ArrayList<>();
+        List<Message> messagesReceiver = new ArrayList<>();
+        List<Chat> chatsUser1 = new ArrayList<>();
+        List<Chat> chatsUser2 = new ArrayList<>();
         if(Boolean.FALSE.equals(name.equals(configUser.getName()))) {
+            subscriptionsSubscriber = this.subscriptionRepository.findAllBySubscriber(user);
+            subscriptionsProducer = this.subscriptionRepository.findAllByProducer(user);
+            themes = this.themeRepository.findAllByUser(user);
+            posts = this.postRepository.findAllByUser(user);
+            comments = this.commentRepository.findAllByUser(user);
+            messagesEmitter = this.messageRepository.findAllByEmitter(user);
+            messagesReceiver = this.messageRepository.findAllByReceiver(user);
+            chatsUser1 = this.chatRepository.findAllByUser1(user);
+            chatsUser2 = this.chatRepository.findAllByUser2(user);
+
             this.userRepository.delete(user);
         }
 
@@ -182,16 +279,13 @@ public class UserServiceImpl implements UserService {
 
         User userEdited = this.userRepository.save(user);
 
-        for(Subscription subscription : subscriptionsSubscriber) {
-            subscription.setSubscriber(userEdited);
-
-            this.subscriptionRepository.save(subscription);
-        }
-
-        for(Subscription subscription : subscriptionsProducer) {
-            subscription.setProducer(userEdited);
-
-            this.subscriptionRepository.save(subscription);
+        if(Boolean.FALSE.equals(name.equals(configUser.getName()))) {
+            this.updateSubscriptions(subscriptionsSubscriber, subscriptionsProducer, userEdited);
+            this.updateThemes(themes, userEdited);
+            this.updatePosts(posts, userEdited);
+            this.updateComments(comments, userEdited);
+            this.updateMessages(messagesEmitter, messagesReceiver, userEdited);
+            this.updateChats(chatsUser1, chatsUser2, userEdited);
         }
 
         return userEdited;
@@ -214,7 +308,7 @@ public class UserServiceImpl implements UserService {
         this.subscriptionRepository.deleteAllBySubscriber(user);
         this.subscriptionRepository.deleteAllByProducer(user);
 
-        List<Post> posts = this.postRepository.findByUser(user);
+        List<Post> posts = this.postRepository.findAllByUser(user);
         for(Post post : posts) {
             for(Tag tag : post.getTags()) {
                 this.tagRepository.delete(tag);

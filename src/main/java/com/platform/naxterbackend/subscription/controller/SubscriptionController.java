@@ -75,7 +75,7 @@ public class SubscriptionController {
         value = {"/{id}/unsubscribe"},
         consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
     )
-    public ResponseEntity<?> desubscribe(Model model,
+    public ResponseEntity<?> unsubscribe(Model model,
                                          @PathVariable String id,
                                          @Valid @RequestBody Join join,
                                          BindingResult result) {

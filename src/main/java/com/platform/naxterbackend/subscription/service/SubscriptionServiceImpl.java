@@ -22,6 +22,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private UserRepository userRepository;
 
 
+    @Override
     public Subscription getSubscription(String subscriber, String producer) {
         User userSubscriber = this.userRepository.findByNameIgnoreCase(subscriber);
         User userProducer = this.userRepository.findByNameIgnoreCase(producer);
@@ -29,10 +30,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return this.subscriptionRepository.findBySubscriberAndProducer(userSubscriber, userProducer);
     }
 
+    @Override
     public List<Subscription> getSubscriptions() {
         return this.subscriptionRepository.findAll();
     }
 
+    @Override
     public List<Subscription> getSubscriptionsBySubscriber(String name) {
         User subscriber = this.userRepository.findByNameIgnoreCase(name);
 

@@ -1,7 +1,6 @@
 package com.platform.naxterbackend.post.repository;
 
 import com.platform.naxterbackend.post.model.Post;
-import com.platform.naxterbackend.theme.model.Theme;
 import com.platform.naxterbackend.user.model.User;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -35,7 +34,7 @@ public interface PostRepository extends MongoRepository<Post, String> {
 
     List<Post> findTop4ByUserOrderByRatingDesc(User user);
 
-    List<Post> findByUser(User user);
+    List<Post> findAllByUser(User user);
 
     Long countByUser(User user);
 

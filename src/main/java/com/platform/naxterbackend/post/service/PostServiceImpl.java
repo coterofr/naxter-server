@@ -1,13 +1,12 @@
 package com.platform.naxterbackend.post.service;
 
+import com.platform.naxterbackend.comment.repository.CommentRepository;
 import com.platform.naxterbackend.post.model.Post;
 import com.platform.naxterbackend.post.model.Tag;
 import com.platform.naxterbackend.post.model.UserPost;
 import com.platform.naxterbackend.post.repository.PostRepository;
 import com.platform.naxterbackend.post.repository.TagRepository;
 import com.platform.naxterbackend.post.validator.SearchValidator;
-import com.platform.naxterbackend.profile.model.Profile;
-import com.platform.naxterbackend.profile.repository.ProfileRepository;
 import com.platform.naxterbackend.theme.model.Theme;
 import com.platform.naxterbackend.theme.repository.ThemeRepository;
 import com.platform.naxterbackend.user.model.User;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +30,8 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private CommentRepository commentRepository;
     @Autowired
     private TagRepository tagRepository;
     @Autowired
@@ -86,6 +86,8 @@ public class PostServiceImpl implements PostService {
         Post post = new Post();
         post.setName(userPost.getName());
         post.setDescription(userPost.getDescription());
+        post.setNumRatings(BigInteger.ZERO);
+        post.setRating(new BigDecimal(0));
 
         User user = this.userRepository.findByNameIgnoreCase(userPost.getUser());
         post.setUser(user);
@@ -119,6 +121,8 @@ public class PostServiceImpl implements PostService {
         for(Tag tag : post.getTags()) {
             this.tagRepository.delete(tag);
         }
+
+        this.commentRepository.deleteAllByPost(post);
 
         this.postRepository.delete(post);
 
@@ -156,7 +160,7 @@ public class PostServiceImpl implements PostService {
         User user = post.getUser();
 
         Long numPosts = this.postRepository.countByUser(user);
-        List<Post> posts = this.postRepository.findByUser(user);
+        List<Post> posts = this.postRepository.findAllByUser(user);
 
         List<BigDecimal> listRatings = posts.stream().map(p -> p.getRating()).collect(Collectors.toList());
         BigDecimal totalRatings = listRatings.stream().reduce((total, rating)-> total.add(rating)).get();

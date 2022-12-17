@@ -36,7 +36,7 @@ public class ThemeController {
         return ResponseEntity.ok().body(this.themeService.getThemes());
     }
 
-    @PreAuthorize("hasRole('GENERIC')")
+    @PreAuthorize("hasRole('PRODUCER')")
     @GetMapping(
         value = {"/users/{idUser}/search"},
         produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
