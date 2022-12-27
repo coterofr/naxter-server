@@ -1,6 +1,5 @@
 package com.platform.naxterbackend.user.model;
 
-import com.platform.naxterbackend.merchandising.model.Merchandising;
 import com.platform.naxterbackend.profile.model.Profile;
 import com.platform.naxterbackend.theme.model.Theme;
 import lombok.Getter;
@@ -54,8 +53,8 @@ public class User {
     @DBRef
     private List<Theme> themes;
 
-    @DBRef
-    private Merchandising merchandising;
+    @NotNull
+    private Boolean merchandising;
 
 
     public User() { }
@@ -68,7 +67,7 @@ public class User {
                 BigDecimal rating,
                 List<Role> roles,
                 Profile profile,
-                Merchandising merchandising) {
+                Boolean merchandising) {
         this.name = name;
         this.email = email;
         this.userName = userName;

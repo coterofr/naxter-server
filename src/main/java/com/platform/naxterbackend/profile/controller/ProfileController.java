@@ -53,27 +53,11 @@ public class ProfileController {
 
     @PreAuthorize("hasRole('GENERIC')")
     @GetMapping(
-        value = { "/{id}"},
+        value = { "/{id}", "/{id}/account"},
         produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
     )
     public ResponseEntity<?> get(Model model,
                                  @PathVariable(name = "id") String name) {
-        if(!UserValidator.validName(name)) {
-            return ResponseEntity.badRequest().body("Request with errors");
-        } else {
-            User user = this.userService.getUser(name);
-
-            return ResponseEntity.ok().body(user);
-        }
-    }
-
-    @PreAuthorize("hasRole('GENERIC')")
-    @GetMapping(
-        value = { "/{id}/account"},
-        produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
-    )
-    public ResponseEntity<?> getAccount(Model model,
-                                        @PathVariable(name = "id") String name) {
         if(!UserValidator.validName(name)) {
             return ResponseEntity.badRequest().body("Request with errors");
         } else {

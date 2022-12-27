@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
         Profile profileSaved = this.profileRepository.save(profile);
 
         User user = new User(registerUser.getName(), registerUser.getEmail(), registerUser.getUserName(), passwordEncoded,
-                             Boolean.FALSE, new BigDecimal(0.0), roles, profileSaved, null);
+                             Boolean.FALSE, new BigDecimal(0.0), roles, profileSaved, Boolean.FALSE);
 
         return userRepository.save(user);
     }
@@ -340,6 +340,16 @@ public class UserServiceImpl implements UserService {
         Role role = this.roleRepository.findByType(type);
         roles.add(role);
         user.setRoles(roles);
+
+        return this.userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = false)
+    public User activateOrDesactivateMerchandising(String name) {
+        User user = this.userRepository.findByNameIgnoreCase(name);
+
+        user.setMerchandising(!user.getMerchandising());
 
         return this.userRepository.save(user);
     }

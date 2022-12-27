@@ -6,10 +6,12 @@ import com.platform.naxterbackend.chat.repository.ChatRepository;
 import com.platform.naxterbackend.chat.repository.MessageRepository;
 import com.platform.naxterbackend.comment.model.Comment;
 import com.platform.naxterbackend.comment.repository.CommentRepository;
-import com.platform.naxterbackend.merchandising.model.Item;
+import com.platform.naxterbackend.merchandising.model.Cart;
 import com.platform.naxterbackend.merchandising.model.Merchandising;
-import com.platform.naxterbackend.merchandising.repository.ItemRepository;
+import com.platform.naxterbackend.merchandising.model.Product;
+import com.platform.naxterbackend.merchandising.repository.CartRepository;
 import com.platform.naxterbackend.merchandising.repository.MerchandisingRepository;
+import com.platform.naxterbackend.merchandising.repository.ProductRepository;
 import com.platform.naxterbackend.post.model.Post;
 import com.platform.naxterbackend.post.model.Tag;
 import com.platform.naxterbackend.post.repository.PostRepository;
@@ -68,7 +70,9 @@ public class InitDataRunner implements ApplicationRunner {
     @Autowired
     private MerchandisingRepository merchandisingRepository;
     @Autowired
-    private ItemRepository itemRepository;
+    private ProductRepository productRepository;
+    @Autowired
+    private CartRepository cartRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -76,28 +80,6 @@ public class InitDataRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         try {
-
-
-            /* INIT DATA MERCHANDISING */
-
-
-            this.itemRepository.deleteAll();
-            this.merchandisingRepository.deleteAll();
-
-            Item item1 = new Item("Item 1", "Descripción del Item 1", null);
-
-            Item item1Saved = this.itemRepository.save(item1);
-
-            List<Item> items = new ArrayList<>();
-            items.add(item1Saved);
-
-            Merchandising merchandising1 = new Merchandising("Merchandising 1", "Descripción del Merchandising 1", items);
-            Merchandising merchandising2 = new Merchandising("Merchandising 2", "Descripción del Merchandising 2", new ArrayList<>());
-            Merchandising merchandising3 = new Merchandising("Merchandising 3", "Descripción del Merchandising 3", new ArrayList<>());
-
-            Merchandising merchandising1Saved = this.merchandisingRepository.save(merchandising1);
-            Merchandising merchandising2Saved = this.merchandisingRepository.save(merchandising2);
-            Merchandising merchandising3Saved = this.merchandisingRepository.save(merchandising3);
 
 
             /* INIT DATA PROFILES */
@@ -171,25 +153,25 @@ public class InitDataRunner implements ApplicationRunner {
 
 
             User user1 = new User("user_1", "user_1@gmail.com", "User1 Surname", this.passwordEncoder.encode("12345"),
-                         Boolean.FALSE, new BigDecimal(0.0), roles1, profile1Saved, null);
+                         Boolean.FALSE, new BigDecimal(0.0), roles1, profile1Saved, Boolean.FALSE);
             User user2 = new User("user_2", "user_2@gmail.com", "User2 Surname", this.passwordEncoder.encode("12345"),
-                         Boolean.FALSE, new BigDecimal(0.0), roles2, profile2Saved, null);
+                         Boolean.FALSE, new BigDecimal(0.0), roles2, profile2Saved, Boolean.FALSE);
             User user3 = new User("user_3", "user_3@gmail.com", "User3 Surname", this.passwordEncoder.encode("12345"),
-                         Boolean.FALSE, new BigDecimal(0.0), roles3, profile3Saved, null);
+                         Boolean.FALSE, new BigDecimal(0.0), roles3, profile3Saved, Boolean.FALSE);
             User user4 = new User("user_4", "user_4@gmail.com", "User4 Surname", this.passwordEncoder.encode("12345"),
-                         Boolean.FALSE, new BigDecimal(0.0), roles4, profile4Saved, null);
+                         Boolean.FALSE, new BigDecimal(0.0), roles4, profile4Saved, Boolean.FALSE);
             User user5 = new User("user_5", "user_5@gmail.com", "User5 Surname", this.passwordEncoder.encode("12345"),
-                         Boolean.FALSE, new BigDecimal(4.0), roles5, profile5Saved, null);
+                         Boolean.FALSE, new BigDecimal(4.0), roles5, profile5Saved, Boolean.FALSE);
             User user6 = new User("user_6", "user_6@gmail.com", "User6 Surname", this.passwordEncoder.encode("12345"),
-                         Boolean.FALSE, new BigDecimal(2.5), roles6, profile6Saved, null);
+                         Boolean.FALSE, new BigDecimal(2.5), roles6, profile6Saved, Boolean.FALSE);
             User user7 = new User("user_7", "user_7@gmail.com", "User7 Surname", this.passwordEncoder.encode("12345"),
-                         Boolean.FALSE, new BigDecimal(5.0), roles7, profile7Saved, merchandising1Saved);
+                         Boolean.FALSE, new BigDecimal(5.0), roles7, profile7Saved, Boolean.FALSE);
             User user8 = new User("user_8", "user_8@gmail.com", "User8 Surname", this.passwordEncoder.encode("12345"),
-                         Boolean.FALSE, new BigDecimal(6.0), roles8, profile8Saved, merchandising2Saved);
+                         Boolean.FALSE, new BigDecimal(6.0), roles8, profile8Saved, Boolean.FALSE);
             User user9 = new User("user_9", "user_9@gmail.com", "User9 Surname", this.passwordEncoder.encode("12345"),
-                         Boolean.FALSE, new BigDecimal(7.0), roles9, profile9Saved, null);
+                         Boolean.FALSE, new BigDecimal(7.0), roles9, profile9Saved, Boolean.TRUE);
             User user10 = new User("carlos_otero", "carlos_otero@gmail.com", "Carlos Otero Franjo", this.passwordEncoder.encode("12345"),
-                          Boolean.FALSE, new BigDecimal(9.5), roles10, profile10Saved, merchandising3Saved);
+                          Boolean.FALSE, new BigDecimal(9.5), roles10, profile10Saved, Boolean.TRUE);
 
             User user1Saved = this.userRepository.save(user1);
             User user2Saved = this.userRepository.save(user2);
@@ -465,6 +447,46 @@ public class InitDataRunner implements ApplicationRunner {
             Chat chat = new Chat(user10Saved, user9Saved, messages);
 
             this.chatRepository.save(chat);
+
+
+            /* INIT DATA MERCHANDISING */
+
+
+            this.cartRepository.deleteAll();
+            this.productRepository.deleteAll();
+            this.merchandisingRepository.deleteAll();
+
+            Merchandising merchandising1 = new Merchandising("merchandising_1", "Descripción del Merchandising 1", user9Saved,
+                                           new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2022-05-10 15:30:15"));
+            Merchandising merchandising2 = new Merchandising("merchandising_2", "Descripción del Merchandising 2", user10Saved,
+                                           new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2022-05-10 15:35:15"));
+
+            Merchandising merchandising1Saved = this.merchandisingRepository.save(merchandising1);
+            Merchandising merchandising2Saved = this.merchandisingRepository.save(merchandising2);
+
+            Product product1 = new Product("product_1", "Descripción del Product 1", new BigDecimal("5.99"), 20, null, merchandising1Saved, user9Saved,
+                               new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2022-05-10 15:30:15"));
+            Product product2 = new Product("product_2", "Descripción del Product 2", new BigDecimal("6.5"), 21, null, merchandising1Saved, user9Saved,
+                               new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2022-05-10 15:30:16"));
+            Product product3 = new Product("product_3", "Descripción del Product 3", new BigDecimal("7.95"), 22, null, merchandising2Saved, user10Saved,
+                               new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2022-05-10 15:35:15"));
+            Product product4 = new Product("product_4", "Descripción del Product 4", new BigDecimal("8.5"), 23, null, merchandising2Saved, user10Saved,
+                               new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2022-05-10 15:35:16"));
+            Product product5 = new Product("product_5", "Descripción del Product 5", new BigDecimal("9.5"), 24, null, merchandising2Saved, user10Saved,
+                               new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2022-05-10 15:35:17"));
+
+            Product product1Saved = this.productRepository.save(product1);
+            Product product2Saved = this.productRepository.save(product2);
+            Product product3Saved = this.productRepository.save(product3);
+            Product product4Saved = this.productRepository.save(product4);
+            Product product5Saved = this.productRepository.save(product5);
+
+            List<Product> products = new ArrayList<>();
+            products.add(product1Saved);
+            products.add(product5Saved);
+            Cart cart = new Cart(user10Saved, products);
+
+            Cart cartSaved = this.cartRepository.save(cart);
 
         } catch (Exception e) {
             logger.error("Error en los registros de las entidades: " + e.getMessage());

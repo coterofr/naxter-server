@@ -1,14 +1,15 @@
 package com.platform.naxterbackend.merchandising.model;
 
+import com.platform.naxterbackend.user.model.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -16,24 +17,29 @@ import java.util.List;
 public class Merchandising {
 
     @Id
-    private String id;
-
-    @NotBlank
     @Size(min = 5, max = 25)
     private String name;
 
     @Size(min = 5, max = 500)
     private String description;
 
+    @NotNull
     @DBRef
-    private List<Item> items;
+    private User user;
+
+    @NotNull
+    private Date date;
 
 
     public Merchandising() { }
 
-    public Merchandising(String name, String description, List<Item> items) {
+    public Merchandising(String name,
+                         String description,
+                         User user,
+                         Date date) {
         this.name = name;
         this.description = description;
-        this.items = items;
+        this.user = user;
+        this.date = date;
     }
 }

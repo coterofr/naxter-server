@@ -48,4 +48,6 @@ public interface UserService {
     String delete(String name);
 
     User changeGenericRole(String name);
+
+    User activateOrDesactivateMerchandising(String name);
 }

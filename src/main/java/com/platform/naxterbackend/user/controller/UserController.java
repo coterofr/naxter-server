@@ -57,7 +57,7 @@ public class UserController {
         return ResponseEntity.ok().body(this.userService.getSubscribedAuthors(name));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CONSUMER')")
     @GetMapping(
         value = { "/{id}"},
         produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
@@ -144,6 +144,23 @@ public class UserController {
             return ResponseEntity.badRequest().body("Request with errors");
         } else {
             User user = this.userService.changeGenericRole(name);
+
+            return ResponseEntity.ok().body(user);
+        }
+    }
+
+    @PreAuthorize("hasRole('CONSUMER')")
+    @PostMapping(
+        value = {"/{id}/change-merchandising"},
+        consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+    )
+    public ResponseEntity<?> activateOrDesactivateMerchandising(Model model,
+                                                                @PathVariable String id,
+                                                                @RequestBody String name) {
+        if(!UserValidator.validName(name)) {
+            return ResponseEntity.badRequest().body("Request with errors");
+        } else {
+            User user = this.userService.activateOrDesactivateMerchandising(name);
 
             return ResponseEntity.ok().body(user);
         }
