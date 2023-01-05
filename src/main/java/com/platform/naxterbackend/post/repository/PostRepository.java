@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface PostRepository extends MongoRepository<Post, String> {
 
-    @Query("{ 'name' : { '$regex' : ?0 , $options: 'i'}}")
+    @Query("{ 'name' : { '$regex' : ?0 , $options: 'i'} }")
     List<Post> findAllByName(String name, Sort sort);
 
     @Query("{ 'name' : { '$regex' : ?0 , $options: 'i'}, 'theme.$id' : { '$regex' : ?1 , $options: 'i'} }")

@@ -108,7 +108,7 @@ public class InitDataRunner implements ApplicationRunner {
             Profile profile9 = new Profile("Descripción del perfil del usuario 9 para la introducción de las características más destacables de este.",
                                new SimpleDateFormat("yyyy-MM-dd").parse("2003-05-15"), 9);
             Profile profile10 = new Profile("Descripción del perfil de Carlos Otero para la introducción de las características más destacables de este.",
-                                new SimpleDateFormat("yyyy-MM-dd").parse("1997-07-22"), 0);
+                                new SimpleDateFormat("yyyy-MM-dd").parse("1997-07-22"), 1);
 
             Profile profile1Saved = this.profileRepository.save(profile1);
             Profile profile2Saved = this.profileRepository.save(profile2);
@@ -190,9 +190,11 @@ public class InitDataRunner implements ApplicationRunner {
 
             this.subscriptionRepository.deleteAll();
 
-            Subscription subscription = new Subscription(new SimpleDateFormat("yyyy-MM-dd").parse("2002-05-15"), Boolean.FALSE, user10Saved, user9Saved, null);
+            Subscription subscription1 = new Subscription(new SimpleDateFormat("yyyy-MM-dd").parse("2022-05-15"), Boolean.FALSE, user10Saved, user7Saved, null);
+            Subscription subscription2 = new Subscription(new SimpleDateFormat("yyyy-MM-dd").parse("2022-06-15"), Boolean.FALSE, user10Saved, user9Saved, null);
 
-            Subscription subscriptionSaved = this.subscriptionRepository.save(subscription);
+            Subscription subscription1Saved = this.subscriptionRepository.save(subscription1);
+            Subscription subscription2Saved = this.subscriptionRepository.save(subscription2);
 
 
             /* INIT DATA POSTS */

@@ -10,6 +10,12 @@ import com.platform.naxterbackend.chat.repository.ChatRepository;
 import com.platform.naxterbackend.chat.repository.MessageRepository;
 import com.platform.naxterbackend.comment.model.Comment;
 import com.platform.naxterbackend.comment.repository.CommentRepository;
+import com.platform.naxterbackend.merchandising.model.Cart;
+import com.platform.naxterbackend.merchandising.model.Merchandising;
+import com.platform.naxterbackend.merchandising.model.Product;
+import com.platform.naxterbackend.merchandising.repository.CartRepository;
+import com.platform.naxterbackend.merchandising.repository.MerchandisingRepository;
+import com.platform.naxterbackend.merchandising.repository.ProductRepository;
 import com.platform.naxterbackend.post.model.Post;
 import com.platform.naxterbackend.post.model.Tag;
 import com.platform.naxterbackend.post.repository.PostRepository;
@@ -63,6 +69,12 @@ public class UserServiceImpl implements UserService {
     private MessageRepository messageRepository;
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+    @Autowired
+    private MerchandisingRepository merchandisingRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private CartRepository cartRepository;
     @Autowired
     private JwtProvider jwtProvider;
 
@@ -241,6 +253,29 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    private void updateMerchandisings(List<Merchandising> merchandisings,
+                                      List<Product> products,
+                                      List<Cart> carts,
+                                      User user) {
+        for(Merchandising merchandising : merchandisings) {
+            merchandising.setUser(user);
+
+            this.merchandisingRepository.save(merchandising);
+        }
+
+        for(Product product : products) {
+            product.setUser(user);
+
+            this.productRepository.save(product);
+        }
+
+        for(Cart cart : carts) {
+            cart.setBuyer(user);
+
+            this.cartRepository.save(cart);
+        }
+    }
+
     @Override
     @Transactional(readOnly = false)
     public User edit(String name, ConfigUser configUser) {
@@ -255,6 +290,9 @@ public class UserServiceImpl implements UserService {
         List<Message> messagesReceiver = new ArrayList<>();
         List<Chat> chatsUser1 = new ArrayList<>();
         List<Chat> chatsUser2 = new ArrayList<>();
+        List<Merchandising> merchandisings = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
+        List<Cart> carts = new ArrayList<>();
         if(Boolean.FALSE.equals(name.equals(configUser.getName()))) {
             subscriptionsSubscriber = this.subscriptionRepository.findAllBySubscriber(user);
             subscriptionsProducer = this.subscriptionRepository.findAllByProducer(user);
@@ -265,6 +303,9 @@ public class UserServiceImpl implements UserService {
             messagesReceiver = this.messageRepository.findAllByReceiver(user);
             chatsUser1 = this.chatRepository.findAllByUser1(user);
             chatsUser2 = this.chatRepository.findAllByUser2(user);
+            merchandisings = this.merchandisingRepository.findAllByUser(user);
+            products = this.productRepository.findAllByUser(user);
+            carts = this.cartRepository.findAllByBuyer(user);
 
             this.userRepository.delete(user);
         }
@@ -286,6 +327,7 @@ public class UserServiceImpl implements UserService {
             this.updateComments(comments, userEdited);
             this.updateMessages(messagesEmitter, messagesReceiver, userEdited);
             this.updateChats(chatsUser1, chatsUser2, userEdited);
+            this.updateMerchandisings(merchandisings, products, carts, user);
         }
 
         return userEdited;
@@ -323,6 +365,22 @@ public class UserServiceImpl implements UserService {
         this.messageRepository.deleteAllByReceiver(user);
         this.chatRepository.deleteAllByUser1(user);
         this.chatRepository.deleteAllByUser2(user);
+
+        this.cartRepository.deleteAllByBuyer(user);
+
+        List<Product> products = this.productRepository.findAllByUser(user);
+        for(Product product :  products) {
+            List<Cart> carts = this.cartRepository.findByProductsContaining(product);
+            for(Cart cart : carts) {
+                List<Product> productsCart = cart.getProducts();
+                productsCart.removeIf(p -> product.getId().equals(p.getId()));
+
+                this.cartRepository.save(cart);
+            }
+        }
+
+        this.productRepository.deleteAllByUser(user);
+        this.merchandisingRepository.deleteAllByUser(user);
 
         this.profileRepository.delete(user.getProfile());
         this.userRepository.delete(user);

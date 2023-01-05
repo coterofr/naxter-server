@@ -14,4 +14,8 @@ public interface CartRepository extends MongoRepository<Cart, String> {
     Cart findByBuyer(User buyer);
 
     List<Cart> findByProductsContaining(Product product);
+
+    List<Cart> findAllByBuyer(User buyer);
+
+    void deleteAllByBuyer(User buyer);
 }

@@ -6,6 +6,12 @@ import com.platform.naxterbackend.chat.repository.ChatRepository;
 import com.platform.naxterbackend.chat.repository.MessageRepository;
 import com.platform.naxterbackend.comment.model.Comment;
 import com.platform.naxterbackend.comment.repository.CommentRepository;
+import com.platform.naxterbackend.merchandising.model.Cart;
+import com.platform.naxterbackend.merchandising.model.Merchandising;
+import com.platform.naxterbackend.merchandising.model.Product;
+import com.platform.naxterbackend.merchandising.repository.CartRepository;
+import com.platform.naxterbackend.merchandising.repository.MerchandisingRepository;
+import com.platform.naxterbackend.merchandising.repository.ProductRepository;
 import com.platform.naxterbackend.post.model.Post;
 import com.platform.naxterbackend.post.repository.PostRepository;
 import com.platform.naxterbackend.profile.model.Account;
@@ -45,6 +51,12 @@ public class ProfileServiceImpl implements ProfileService {
     private MessageRepository messageRepository;
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+    @Autowired
+    private MerchandisingRepository merchandisingRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private CartRepository cartRepository;
 
 
     @Override
@@ -127,6 +139,29 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
+    private void updateMerchandisings(List<Merchandising> merchandisings,
+                                      List<Product> products,
+                                      List<Cart> carts,
+                                      User user) {
+        for(Merchandising merchandising : merchandisings) {
+            merchandising.setUser(user);
+
+            this.merchandisingRepository.save(merchandising);
+        }
+
+        for(Product product : products) {
+            product.setUser(user);
+
+            this.productRepository.save(product);
+        }
+
+        for(Cart cart : carts) {
+            cart.setBuyer(user);
+
+            this.cartRepository.save(cart);
+        }
+    }
+
     @Override
     @Transactional(readOnly = false)
     public User editAccount(String name, Account account) {
@@ -141,6 +176,9 @@ public class ProfileServiceImpl implements ProfileService {
         List<Message> messagesReceiver = new ArrayList<>();
         List<Chat> chatsUser1 = new ArrayList<>();
         List<Chat> chatsUser2 = new ArrayList<>();
+        List<Merchandising> merchandisings = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
+        List<Cart> carts = new ArrayList<>();
         if(Boolean.FALSE.equals(name.equals(account.getName()))) {
             subscriptionsSubscriber = this.subscriptionRepository.findAllBySubscriber(user);
             subscriptionsProducer = this.subscriptionRepository.findAllByProducer(user);
@@ -151,6 +189,9 @@ public class ProfileServiceImpl implements ProfileService {
             messagesReceiver = this.messageRepository.findAllByReceiver(user);
             chatsUser1 = this.chatRepository.findAllByUser1(user);
             chatsUser2 = this.chatRepository.findAllByUser2(user);
+            merchandisings = this.merchandisingRepository.findAllByUser(user);
+            products = this.productRepository.findAllByUser(user);
+            carts = this.cartRepository.findAllByBuyer(user);
 
             this.userRepository.delete(user);
         }
@@ -168,6 +209,7 @@ public class ProfileServiceImpl implements ProfileService {
             this.updateComments(comments, userEdited);
             this.updateMessages(messagesEmitter, messagesReceiver, userEdited);
             this.updateChats(chatsUser1, chatsUser2, userEdited);
+            this.updateMerchandisings(merchandisings, products, carts, user);
         }
 
         Profile profile = userEdited.getProfile();

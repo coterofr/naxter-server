@@ -182,15 +182,16 @@ public class PostController {
 
     @PreAuthorize("hasRole('PRODUCER')")
     @PostMapping(
-        value = {"/tags/{idTag}/delete", "/{idPost}/tags/{idTag}/delete"},
+        value = {"/{idPost}/tags/{idTag}/delete"},
         consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
     )
     public ResponseEntity<String> deleteTag(Model model,
+                                            @PathVariable("idPost") String idPost,
                                             @RequestBody String id) {
-        if(!PostValidator.validId(id)) {
+        if(!PostValidator.validId(idPost) || !PostValidator.validId(id)) {
             return ResponseEntity.badRequest().body("Request with errors");
         } else {
-            String idDeleted = this.tagService.delete(id);
+            String idDeleted = this.tagService.delete(id, idPost);
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("id", idDeleted);

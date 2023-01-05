@@ -24,7 +24,7 @@ public class Profile {
     private Date dateBirth;
 
     @Min(0)
-    @Max(100)
+    @Max(500)
     private Integer visits;
 
 

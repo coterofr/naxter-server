@@ -53,8 +53,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public String delete(String id) {
+    public String delete(String id, String idPost) {
         Tag tag = this.tagRepository.findById(id).get();
+
+        Post post = this.postRepository.findById(idPost).get();
+        List<Tag> tags = post.getTags();
+        tags.removeIf(t -> tag.getId().equals(t.getId()));
+
+        this.postRepository.save(post);
 
         this.tagRepository.delete(tag);
 

@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends MongoRepository<Message, String> {
 
-    @Query("{ '$or':[ { '$and': [ { 'emitter.$id' : ?0 }, { 'receiver.$id' : ?1 } ] }, { '$and': [ { 'receiver.$id' : ?0 }, { 'emitter.$id' : ?1 } ] } ] }")
+    @Query("{ '$or' : [ { '$and' : [ { 'emitter.$id' : ?0 }, { 'receiver.$id' : ?1 } ] }, { '$and' : [ { 'receiver.$id' : ?0 }, { 'emitter.$id' : ?1 } ] } ] }")
     List<Message> findByEmitterAndReceiverOrderByDate(String user1, String user2, Sort sort);
 
     List<Message> findAllByEmitter(User emitter);

@@ -11,7 +11,7 @@ public class SearchValidator {
     public static Boolean validParam(List<String> params) {
         if(params != null && !params.isEmpty()) {
             for(String param : params) {
-                if(params == null || params.isEmpty() || param.trim().isEmpty()) {
+                if(param == null || param.isEmpty() || param.trim().isEmpty()) {
                     return Boolean.FALSE;
                 }
             }

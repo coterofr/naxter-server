@@ -15,5 +15,5 @@ public interface TagService {
 
     Page<Tag> getTagsByPost(String id, Pageable pageable);
 
-    String delete(String id);
+    String delete(String id, String idPost);
 }
